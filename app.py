@@ -189,6 +189,8 @@ def view_all_users():
 
 # Flask-Mail==0.9.1
 
+#git config --global user.email "you@example.com"
+#git config --global user.name "Your Name"
 
 if __name__ == '__main__':
     app.run(debug=True)
