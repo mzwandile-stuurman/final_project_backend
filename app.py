@@ -8,8 +8,9 @@ from flask_mail import Mail, Message
 from smtplib import SMTPRecipientsRefused, SMTPAuthenticationError
 from werkzeug.utils import redirect
 
+
 class User(object):
-    def __init__(self, id, first_name,last_name ,username, password,user_email,phone_number,address):
+    def __init__(self, id, first_name, last_name, username, password, user_email, phone_number, address):
         self.id = id
         self.first_name = first_name
         self.last_name = last_name
@@ -20,8 +21,8 @@ class User(object):
         self.address = address
 
 
+# user tables
 def user_reg():
-
     conn = sqlite3.connect('Point_of_Sale.db')
     print("Opened database successfully")
 
@@ -33,8 +34,9 @@ def user_reg():
     print("user table created successfully")
     conn.close()
 
-def products():
 
+# products table
+def products():
     conn = sqlite3.connect('Point_of_Sale.db')
     print("Opened database successfully")
 
@@ -45,8 +47,9 @@ def products():
     print("user table created successfully")
     conn.close()
 
-def bussines_application():
 
+# bussinesess table
+def bussines_application():
     conn = sqlite3.connect('Point_of_Sale.db')
     print("Opened database successfully")
 
@@ -58,11 +61,13 @@ def bussines_application():
     print("user table created successfully")
     conn.close()
 
+
+# shipping address table
 def shipping_address():
     conn = sqlite3.connect('Point_of_Sale.db')
     print("Opened database successfully")
 
-    conn.execute("CREATE TABLE IF NOT EXISTS shipping(ship_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+    conn.execute("CREATE TABLE IF NOT EXISTS shipping_table(ship_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                  "recipient_name TEXT NOT NULL,"
                  "recipient_lastname TEXT NOT NULL,"
                  "company TEXT,"
@@ -70,25 +75,26 @@ def shipping_address():
     print("shipping table created successfully")
     conn.close()
 
+
+# order table
 def orders_table():
     conn = sqlite3.connect('Point_of_Sale.db')
     print("Opened database successfully")
 
-    conn.execute("CREATE TABLE IF NOT EXISTS orders(order_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+    conn.execute("CREATE TABLE IF NOT EXISTS order(order_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                  "order_date TEXT NOT NULL,"
                  "address_delivered TEXT NOT NULL,"
-                 "delivery_contact NUMERIC NOT NULL, business_email TEXT NOT NULL, business_address TEXT NOT NULL)")
+                 "delivery_contact NUMERIC NOT NULL, order_number INTEGER NOT NULL, FOREIGN KEY (order_number) REFERENCES user (user_id) )")
     print("user table created successfully")
     conn.close()
-
 
 
 user_reg()
 products()
 bussines_application()
 
-def fetch_users():
 
+def fetch_users():
     with sqlite3.connect('Point_of_Sale.db') as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM user")
@@ -97,20 +103,26 @@ def fetch_users():
         new_data = []
 
         for data in users:
-            new_data.append(User(data[0],data[1], data[2], data[3], data[4],data[5],data[6],data[7])) # append all data to new_data empty list
+            new_data.append(User(data[0], data[1], data[2], data[3], data[4], data[5], data[6],
+                                 data[7]))  # append all data to new_data empty list
     return new_data
-users = fetch_users()# declare users tables to a variable "users"
-#print(users)
 
-username_table = { u.username: u for u in users } # make a dictionary for username
-userid_table = { u.id: u for u in users } # make a dictionary for user id
-#print(username_table)
-#print(userid_table)
+
+users = fetch_users()  # declare users tables to a variable "users"
+# print(users)
+
+username_table = {u.username: u for u in users}  # make a dictionary for username
+userid_table = {u.id: u for u in users}  # make a dictionary for user id
+
+
+# print(username_table)
+# print(userid_table)
 
 def authenticate(username, password):
     user = username_table.get(username, None)
     if user and hmac.compare_digest(user.password.encode('utf-8'), password.encode('utf-8')):
         return user
+
 
 # identify registered user by user id
 def identity(payload):
@@ -118,22 +130,24 @@ def identity(payload):
     return userid_table.get(user_id, None)
 
 
-
 app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'super-secret'
 app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=2)
 
-#authanticate a loggen in user
+# authanticate a loggen in user
 jwt = JWT(app, authenticate, identity)
+
 
 @app.route('/protected')
 @jwt_required()
 def protected():
     return '%s' % current_identity
 
+
 # register a new user
-@app.route('/user-registration/', methods=["POST"])
+@app.route('/users/', methods=["POST", "GET"])
+@jwt_required
 def user_registration():
     response = {}
     if request.method == "POST":
@@ -152,7 +166,8 @@ def user_registration():
                                "first_name,"
                                "last_name,"
                                "username,"
-                               "password,address,phone_number,user_email) VALUES(?, ?, ?, ?, ?, ?, ?)", (first_name, last_name, username, password,address,phone_number,user_email))
+                               "password,address,phone_number,user_email) VALUES(?, ?, ?, ?, ?, ?, ?)",
+                               (first_name, last_name, username, password, address, phone_number, user_email))
                 conn.commit()
                 response["message"] = "User registered successfully "
                 response["status_code"] = 201
@@ -163,25 +178,67 @@ def user_registration():
             response["status_code"] = 401
             return response
 
+    if request.method == "GET":
+        response = {}
+        with sqlite3.connect("Point_of_Sale.db") as conn:
+            cursor = conn.cursor()
+            cursor.row_factory = sqlite3.Row
+            cursor.execute("SELECT * FROM user")
+            posts = cursor.fetchall()
+            accumulator = []
 
-# View all registered users
-@app.route('/view-users/',methods=['GET'])
-@jwt_required()
-def view_all_users():
+            for i in posts:
+                accumulator.append({k: i[k] for k in i.keys()})
+
+        response['status_code'] = 200
+        response['data'] = tuple(accumulator)
+        return jsonify(response)
+
+
+# View all products
+@app.route('/products/', methods=["POST", "GET"])
+@jwt_required
+def products_info():
     response = {}
-    with sqlite3.connect("Point_of_Sale.db") as conn:
-        cursor = conn.cursor()
-        cursor.row_factory = sqlite3.Row
-        cursor.execute("SELECT * FROM user")
-        posts = cursor.fetchall()
-        accumulator = []
+    if request.method == "POST":
+        try:
+            image = request.form['image']
+            product_name = request.form['product_name']
+            price = request.form['price']
+            brand = request.form['brand']
 
-        for i in posts:
-           accumulator.append({k: i[k] for k in i.keys()})
+            with sqlite3.connect("Point_of_Sale.db") as conn:
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO product("
+                               "image,"
+                               "product_name,"
+                               "price,"
+                               "brand) VALUES(?, ?, ?, ?)", (image, product_name, price, brand))
+                conn.commit()
+                response["message"] = "Product added successfully successfully "
+                response["status_code"] = 201
 
-    response['status_code'] = 200
-    response['data'] = tuple(accumulator)
-    return jsonify(response)
+                return response
+        except Exception:
+            response["message"] = "Enter correct product information"
+            response["status_code"] = 401
+            return response
+
+    if request.method == "GET":
+
+        with sqlite3.connect("Point_of_Sale.db") as conn:
+            cursor = conn.cursor()
+            cursor.row_factory = sqlite3.Row
+            cursor.execute("SELECT * FROM product")
+            posts = cursor.fetchall()
+            accumulator = []
+
+            for i in posts:
+                accumulator.append({k: i[k] for k in i.keys()})
+
+        response['status_code'] = 200
+        response['data'] = tuple(accumulator)
+        return jsonify(response)
 
 
 
@@ -189,9 +246,8 @@ def view_all_users():
 
 # Flask-Mail==0.9.1
 
-#git config --global user.email "you@example.com"
-#git config --global user.name "Your Name"
+# git config --global user.email "you@example.com"
+# git config --global user.name "Your Name"
 
 if __name__ == '__main__':
     app.run(debug=True)
-
