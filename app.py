@@ -196,8 +196,7 @@ def user_registration():
 
 
 # View all products
-@app.route('/products/', methods=["POST", "GET"])
-@jwt_required
+@app.route('/product/', methods=["POST", "GET"])
 def products_info():
     response = {}
     if request.method == "POST":
@@ -223,7 +222,6 @@ def products_info():
             response["message"] = "Enter correct product information"
             response["status_code"] = 401
             return response
-
     if request.method == "GET":
 
         with sqlite3.connect("Point_of_Sale.db") as conn:
@@ -239,6 +237,8 @@ def products_info():
         response['status_code'] = 200
         response['data'] = tuple(accumulator)
         return jsonify(response)
+
+
 
 
 
