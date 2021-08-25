@@ -4,7 +4,7 @@ import datetime
 from flask import Flask, request, jsonify, redirect, render_template
 from flask_jwt import JWT, jwt_required, current_identity
 from flask_cors import CORS, cross_origin
-from flask_mail import Mail,Message
+from flask_mail import Mail, Message
 from smtplib import SMTPRecipientsRefused, SMTPAuthenticationError
 from werkzeug.utils import redirect
 
@@ -187,6 +187,7 @@ def view_all_users():
 
 # register a new business partner
 
+# Flask-Mail==0.9.1
 
 
 if __name__ == '__main__':
