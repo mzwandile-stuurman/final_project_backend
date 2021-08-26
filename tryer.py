@@ -1,10 +1,20 @@
 import sqlite3
-conn = sqlite3.connect('Point_of_Sale.db')
-print("Opened database successfully")
+#Connecting to sqlite
+conn = sqlite3.connect('Final_Project.db')
 
-conn.execute("CREATE TABLE IF NOT EXISTS order(order_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                 "order_date TEXT NOT NULL,"
-                 "address_delivered TEXT NOT NULL,"
-                 "delivery_contact NUMERIC NOT NULL, order_number INTEGER NOT NULL, FOREIGN KEY (order_number) REFERENCES user (user_id) )")
-print("user table created successfully")
-conn.close()
+#Creating a cursor object using the cursor() method
+cursor = conn.cursor()
+
+cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+
+print(cursor.fetchall())
+
+#Doping EMPLOYEE table if already exists
+#cursor.execute("DROP TABLE business")
+#print("Table dropped... ")
+
+#Commit your changes in the database
+#conn.commit()
+
+#Closing the connection
+#conn.close()
