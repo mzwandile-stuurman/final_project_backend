@@ -203,7 +203,7 @@ def protected():
 # register a new user
 @app.route('/users/', methods=["POST", "GET", "PATCH"])
 @cross_origin()
-@jwt_required
+
 def user_registration():
     response = {}
     if request.method == "POST":
@@ -272,7 +272,7 @@ def user_registration():
 # get single user
 @app.route('/user/<int:user_id>', methods=["GET"])
 @cross_origin()
-@jwt_required()
+#@jwt_required()
 def get_user(user_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -292,7 +292,7 @@ def get_user(user_id):
 # delete user by id
 @app.route("/delete-user/<int:post_id>", methods=['POST'])
 @cross_origin()
-@jwt_required()
+#@jwt_required()
 def delete_product(user_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -306,7 +306,8 @@ def delete_product(user_id):
 # update single user
 @app.route('/update-user/<int:user_id>/', methods=["PUT"])
 @cross_origin()
-@jwt_required()
+
+#@jwt_required()
 def edit_user(user_id):
     response = {}
 
@@ -396,7 +397,7 @@ def edit_user(user_id):
 # View all products
 @app.route('/product/', methods=["POST", "GET"])
 @cross_origin()
-@jwt_required()
+
 def products_info():
     response = {}
     if request.method == "POST":
@@ -450,7 +451,7 @@ def products_info():
 # get product by id
 @app.route('/single_product/<int:order_id>', methods=["GET"])
 @cross_origin()
-@jwt_required()
+
 def get_product(order_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -468,7 +469,8 @@ def get_product(order_id):
 # update product by id
 @app.route('/update-product/<int:prod_id>/', methods=["PUT"])
 @cross_origin()
-@jwt_required()
+
+#@jwt_required()
 def update_product(prod_id):
     response = {}
 
@@ -559,7 +561,8 @@ def update_product(prod_id):
 # delete product by id
 @app.route("/delete-product/<int:prod_id>", methods=['POST'])
 @cross_origin()
-@jwt_required()
+
+#@jwt_required()
 def delete_single_product(prod_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -573,7 +576,8 @@ def delete_single_product(prod_id):
 
 @app.route('/orders/', methods= ["POST","GET"])
 @cross_origin()
-@jwt_required()
+
+#@jwt_required()
 def orders_info():
     response = {}
     now = datetime.now()
@@ -624,7 +628,7 @@ def orders_info():
 # get single order by id
 @app.route('/single_order/<int:order_number>', methods=["GET"])
 @cross_origin()
-@jwt_required()
+#@jwt_required()
 def get_order(order_number):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -643,7 +647,7 @@ def get_order(order_number):
  # delete single order
 @app.route("/delete-order/<int:order_id>", methods=['POST'])
 @cross_origin()
-@jwt_required()
+#@jwt_required()
 def delete_order(order_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -657,7 +661,7 @@ def delete_order(order_id):
 # get and fetch all returns
 @app.route('/returns/', methods=["GET","POST"])
 @cross_origin()
-@jwt_required()
+#@jwt_required()
 def returns_info():
     response = {}
     now = datetime.now()
@@ -715,7 +719,7 @@ def returns_info():
 # get returns by id
 @app.route('/get-returns/<int:orde_number>', methods=["GET"])
 @cross_origin()
-@jwt_required()
+#@jwt_required()
 def returns(order_number):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -733,7 +737,7 @@ def returns(order_number):
 # shipping address
 @app.route('/shipping/', methods= ["POST","GET"])
 @cross_origin()
-@jwt_required()
+#@jwt_required()
 def shipping_address():
     response = {}
     now = datetime.now()
@@ -788,7 +792,7 @@ def shipping_address():
 # contact section
 @app.route('/contact-us/', methods=["POST","GET"])
 @cross_origin()
-@jwt_required()
+#@jwt_required()
 def contact():
     response = {}
     if request.method == "POST":
@@ -834,7 +838,7 @@ def contact():
 # business partner registration
 @app.route('/business-register/', methods=["POST","GET"])
 @cross_origin()
-@jwt_required()
+#@jwt_required()
 def business_site_application():
     response = {}
     if request.method == "POST":
