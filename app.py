@@ -9,6 +9,11 @@ from flask_mail import Mail, Message
 from smtplib import SMTPRecipientsRefused, SMTPAuthenticationError
 from werkzeug.utils import redirect
 
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
 
 class User(object):
     def __init__(self, id, first_name, last_name, username, password, user_email, phone_number, address):
@@ -276,18 +281,19 @@ def user_registration():
 def get_user(user_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
+        conn.row_factory = dict_factory
         cursor = conn.cursor()
-        cursor.row_factory = sqlite3.Row
+        #cursor.row_factory = sqlite3.Row
         cursor.execute("SELECT * FROM users WHERE user_id=" + str(user_id))
         user = cursor.fetchone()
-        accumulator = []
-        for i in user:
-            accumulator.append({k: i[k] for k in i.keys()})
+        #accumulator = []
+        #for i in user:
+            #accumulator.append({k: i[k] for k in i.keys()})
 
 
     response['status_code'] = 200
-    response['data'] = tuple(accumulator)
-    return jsonify(response)
+    response['data'] =  user #tuple(accumulator)
+    return response
 
 # delete user by id
 @app.route("/delete-user/<int:post_id>", methods=['POST'])
@@ -306,7 +312,6 @@ def delete_product(user_id):
 # update single user
 @app.route('/update-user/<int:user_id>/', methods=["PUT"])
 @cross_origin()
-
 #@jwt_required()
 def edit_user(user_id):
     response = {}
