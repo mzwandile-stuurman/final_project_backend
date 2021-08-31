@@ -9,11 +9,13 @@ from flask_mail import Mail, Message
 from smtplib import SMTPRecipientsRefused, SMTPAuthenticationError
 from werkzeug.utils import redirect
 
+
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
+
 
 class User(object):
     def __init__(self, id, first_name, last_name, username, password, user_email, phone_number, address):
@@ -36,9 +38,9 @@ def user_reg():
                  "first_name TEXT NOT NULL,"
                  "last_name TEXT NOT NULL,"
                  "username TEXT NOT NULL,"
-                 "password TEXT NOT NULL," 
-                 "address TEXT NOT NULL," 
-                 "phone_number INT NOT NULL," 
+                 "password TEXT NOT NULL,"
+                 "address TEXT NOT NULL,"
+                 "phone_number INT NOT NULL,"
                  "user_email TEXT NOT NULL)")
     print("user table created successfully")
     conn.close()
@@ -208,19 +210,19 @@ def protected():
 # register a new user
 @app.route('/users/', methods=["POST", "GET", "PATCH"])
 @cross_origin()
-
 def user_registration():
     response = {}
     if request.method == "POST":
+
         try:
 
-            first_name = request.form['first_name']
-            last_name = request.form['last_name']
-            username = request.form['username']
-            password = request.form['password']
-            address = request.form['address']
-            phone_number = request.form['phone_number']
-            user_email = request.form['user_email']
+            first_name = request.json['first_name']
+            last_name = request.json['last_name']
+            username = request.json['username']
+            password = request.json['password']
+            address = request.json['address']
+            phone_number = request.json['phone_number']
+            user_email = request.json['user_email']
 
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
@@ -236,7 +238,8 @@ def user_registration():
 
                 return response
         except Exception:
-            response["message"] = "Invalid user information supplied"
+
+            response["message"] = "Invalid user injsonation supplied"
             response["status_code"] = 401
             return response
 
@@ -274,31 +277,32 @@ def user_registration():
         response['data'] = tuple(accumulator)
         return jsonify(response)
 
+
 # get single user
 @app.route('/user/<int:user_id>', methods=["GET"])
 @cross_origin()
-#@jwt_required()
+# @jwt_required()
 def get_user(user_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
         conn.row_factory = dict_factory
         cursor = conn.cursor()
-        #cursor.row_factory = sqlite3.Row
+        # cursor.row_factory = sqlite3.Row
         cursor.execute("SELECT * FROM users WHERE user_id=" + str(user_id))
         user = cursor.fetchone()
-        #accumulator = []
-        #for i in user:
-            #accumulator.append({k: i[k] for k in i.keys()})
-
+        # accumulator = []
+        # for i in user:
+        # accumulator.append({k: i[k] for k in i.keys()})
 
     response['status_code'] = 200
-    response['data'] =  user #tuple(accumulator)
+    response['data'] = user  # tuple(accumulator)
     return response
+
 
 # delete user by id
 @app.route("/delete-user/<int:post_id>", methods=['POST'])
 @cross_origin()
-#@jwt_required()
+# @jwt_required()
 def delete_product(user_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -309,10 +313,11 @@ def delete_product(user_id):
         response['message'] = "User deleted successfully."
     return response
 
+
 # update single user
 @app.route('/update-user/<int:user_id>/', methods=["PUT"])
 @cross_origin()
-#@jwt_required()
+# @jwt_required()
 def edit_user(user_id):
     response = {}
 
@@ -322,7 +327,7 @@ def edit_user(user_id):
 
             put_data = {}
 
-            if incoming_data.get("first_name") is not None: # check if the updated column is price
+            if incoming_data.get("first_name") is not None:  # check if the updated column is price
                 put_data["first_name"] = incoming_data.get("first_name")
                 with sqlite3.connect('final_backend.db') as conn:
                     cursor = conn.cursor()
@@ -379,7 +384,8 @@ def edit_user(user_id):
 
                 with sqlite3.connect('final_backend.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE users SET phone_number =? WHERE user_id=?", (put_data["phone_number"], user_id))
+                    cursor.execute("UPDATE users SET phone_number =? WHERE user_id=?",
+                                   (put_data["phone_number"], user_id))
                     conn.commit()
 
                     response["content"] = "Product description updated successfully"
@@ -398,23 +404,23 @@ def edit_user(user_id):
 
     return response
 
+
 # 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
 # View all products
 @app.route('/product/', methods=["POST", "GET"])
 @cross_origin()
-
 def products_info():
     response = {}
     if request.method == "POST":
         try:
-            image = request.form['image']
-            product_name = request.form['product_name']
-            price = request.form['price']
-            brand = request.form['brand']
-            product_type = request.form['product_type']
-            size = request.form['size']
-            color = request.form['color']
-            order_id = request.form['order_id']
+            image = request.json['image']
+            product_name = request.json['product_name']
+            price = request.json['price']
+            brand = request.json['brand']
+            product_type = request.json['product_type']
+            size = request.json['size']
+            color = request.json['color']
+            order_id = request.json['order_id']
 
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
@@ -434,7 +440,7 @@ def products_info():
 
                 return response
         except Exception:
-            response["message"] = "Enter correct product information"
+            response["message"] = "Enter correct product injsonation"
             response["status_code"] = 401
             return response
     if request.method == "GET":
@@ -453,10 +459,10 @@ def products_info():
         response['data'] = tuple(accumulator)
         return jsonify(response)
 
+
 # get product by id
 @app.route('/single_product/<int:order_id>', methods=["GET"])
 @cross_origin()
-
 def get_product(order_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -471,11 +477,11 @@ def get_product(order_id):
     response['data'] = tuple(accumulator)
     return jsonify(response)
 
+
 # update product by id
 @app.route('/update-product/<int:prod_id>/', methods=["PUT"])
 @cross_origin()
-
-#@jwt_required()
+# @jwt_required()
 def update_product(prod_id):
     response = {}
 
@@ -499,7 +505,8 @@ def update_product(prod_id):
 
                 with sqlite3.connect('final_backend.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE product SET product_name =? WHERE prod_id=?", (put_data["last_name"], prod_id))
+                    cursor.execute("UPDATE product SET product_name =? WHERE prod_id=?",
+                                   (put_data["last_name"], prod_id))
                     conn.commit()
 
                     response["content"] = "Last name updated successfully"
@@ -532,7 +539,8 @@ def update_product(prod_id):
 
                 with sqlite3.connect('final_backend.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE product SET product_type =? WHERE prod_id=?", (put_data["product_type"], prod_id))
+                    cursor.execute("UPDATE product SET product_type =? WHERE prod_id=?",
+                                   (put_data["product_type"], prod_id))
                     conn.commit()
 
                     response["content"] = "Product description updated successfully"
@@ -563,11 +571,11 @@ def update_product(prod_id):
 
     return response
 
+
 # delete product by id
 @app.route("/delete-product/<int:prod_id>", methods=['POST'])
 @cross_origin()
-
-#@jwt_required()
+# @jwt_required()
 def delete_single_product(prod_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -579,20 +587,19 @@ def delete_single_product(prod_id):
     return response
 
 
-@app.route('/orders/', methods= ["POST","GET"])
+@app.route('/orders/', methods=["POST", "GET"])
 @cross_origin()
-
-#@jwt_required()
+# @jwt_required()
 def orders_info():
     response = {}
     now = datetime.now()
     if request.method == "POST":
         try:
-            product_image = request.form['product_image']
-            order_number = request.form['order_number']
-            product_name = request.form['product_name']
-            total_price = request.form['total_price']
-            product_quantity = request.form['product_quantity']
+            product_image = request.json['product_image']
+            order_number = request.json['order_number']
+            product_name = request.json['product_name']
+            total_price = request.json['total_price']
+            product_quantity = request.json['product_quantity']
 
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
@@ -610,7 +617,7 @@ def orders_info():
 
                 return response
         except Exception:
-            response["message"] = "Enter correct order information"
+            response["message"] = "Enter correct order injsonation"
             response["status_code"] = 401
             return response
     if request.method == "GET":
@@ -633,7 +640,7 @@ def orders_info():
 # get single order by id
 @app.route('/single_order/<int:order_number>', methods=["GET"])
 @cross_origin()
-#@jwt_required()
+# @jwt_required()
 def get_order(order_number):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -649,10 +656,10 @@ def get_order(order_number):
     return jsonify(response)
 
 
- # delete single order
+# delete single order
 @app.route("/delete-order/<int:order_id>", methods=['POST'])
 @cross_origin()
-#@jwt_required()
+# @jwt_required()
 def delete_order(order_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -663,24 +670,25 @@ def delete_order(order_id):
         response['message'] = "User deleted successfully."
     return response
 
+
 # get and fetch all returns
-@app.route('/returns/', methods=["GET","POST"])
+@app.route('/returns/', methods=["GET", "POST"])
 @cross_origin()
-#@jwt_required()
+# @jwt_required()
 def returns_info():
     response = {}
     now = datetime.now()
     if request.method == "POST":
         try:
 
-            address_delivered = request.form['address_delivered']
-            delivery_contact = request.form['delivery_contact']
-            order_number = request.form['order_number']
-            product_name = request.form['product_name']
-            product_code = request.form['product_code']
-            reason_for_return = request.form['reason_for_return']
-            product_condition = request.form['product_condition']
-            other_details = request.form['other_details']
+            address_delivered = request.json['address_delivered']
+            delivery_contact = request.json['delivery_contact']
+            order_number = request.json['order_number']
+            product_name = request.json['product_name']
+            product_code = request.json['product_code']
+            reason_for_return = request.json['reason_for_return']
+            product_condition = request.json['product_condition']
+            other_details = request.json['other_details']
 
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
@@ -702,7 +710,7 @@ def returns_info():
 
                 return response
         except Exception:
-            response["message"] = "Enter full information"
+            response["message"] = "Enter full injsonation"
             response["status_code"] = 401
             return response
     if request.method == "GET":
@@ -721,10 +729,11 @@ def returns_info():
         response['data'] = tuple(accumulator)
         return jsonify(response)
 
+
 # get returns by id
 @app.route('/get-returns/<int:orde_number>', methods=["GET"])
 @cross_origin()
-#@jwt_required()
+# @jwt_required()
 def returns(order_number):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
@@ -739,23 +748,24 @@ def returns(order_number):
     response['data'] = tuple(accumulator)
     return jsonify(response)
 
+
 # shipping address
-@app.route('/shipping/', methods= ["POST","GET"])
+@app.route('/shipping/', methods=["POST", "GET"])
 @cross_origin()
-#@jwt_required()
+# @jwt_required()
 def shipping_address():
     response = {}
     now = datetime.now()
     if request.method == "POST":
         try:
 
-            recipient_name = request.form['recipient_name']
-            recipient_lastname = request.form['recipient_lastname']
-            company = request.form['company']
-            recipient_address = request.form['recipient_address']
-            building_name = request.form['building_name']
-            country = request.form['country']
-            postal_code = request.form['product_condition']
+            recipient_name = request.json['recipient_name']
+            recipient_lastname = request.json['recipient_lastname']
+            company = request.json['company']
+            recipient_address = request.json['recipient_address']
+            building_name = request.json['building_name']
+            country = request.json['country']
+            postal_code = request.json['product_condition']
 
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
@@ -775,7 +785,7 @@ def shipping_address():
 
                 return response
         except Exception:
-            response["message"] = "Enter full information"
+            response["message"] = "Enter full injsonation"
             response["status_code"] = 401
             return response
     if request.method == "GET":
@@ -794,18 +804,19 @@ def shipping_address():
         response['data'] = tuple(accumulator)
         return jsonify(response)
 
+
 # contact section
-@app.route('/contact-us/', methods=["POST","GET"])
+@app.route('/contact-us/', methods=["POST", "GET"])
 @cross_origin()
-#@jwt_required()
+# @jwt_required()
 def contact():
     response = {}
     if request.method == "POST":
         try:
 
-            name = request.form['name']
-            email_address = request.form['email_address']
-            enquiry = request.form['enquiry']
+            name = request.json['name']
+            email_address = request.json['email_address']
+            enquiry = request.json['enquiry']
 
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
@@ -820,7 +831,7 @@ def contact():
 
                 return response
         except Exception:
-            response["message"] = "Enter valid information"
+            response["message"] = "Enter valid injsonation"
             response["status_code"] = 401
             return response
 
@@ -840,21 +851,22 @@ def contact():
         response['data'] = tuple(accumulator)
         return jsonify(response)
 
+
 # business partner registration
-@app.route('/business-register/', methods=["POST","GET"])
+@app.route('/business-register/', methods=["POST", "GET"])
 @cross_origin()
-#@jwt_required()
+# @jwt_required()
 def business_site_application():
     response = {}
     if request.method == "POST":
         try:
 
-            business_name = request.form['business_name']
-            products_sold = request.form['products_sold']
-            motivation = request.form['motivation']
-            contact_number = request.form['contact_number']
-            business_email = request.form['business_email']
-            business_address = request.form['business_address']
+            business_name = request.json['business_name']
+            products_sold = request.json['products_sold']
+            motivation = request.json['motivation']
+            contact_number = request.json['contact_number']
+            business_email = request.json['business_email']
+            business_address = request.json['business_address']
 
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
@@ -862,14 +874,15 @@ def business_site_application():
                                "name,"
                                "email_address,"
                                "enquiry) VALUES(?, ?, ?, ?, ?, ?)",
-                               (business_name, products_sold, motivation, contact_number, business_email,business_address))
+                               (business_name, products_sold, motivation, contact_number, business_email,
+                                business_address))
                 conn.commit()
                 response["message"] = " Application received, please wait for response "
                 response["status_code"] = 201
 
                 return response
         except Exception:
-            response["message"] = "Enter valid information"
+            response["message"] = "Enter valid injsonation"
             response["status_code"] = 401
             return response
 
@@ -888,8 +901,6 @@ def business_site_application():
         response['status_code'] = 200
         response['data'] = tuple(accumulator)
         return jsonify(response)
-
-
 
 
 # register a new business partner
