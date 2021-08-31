@@ -258,24 +258,19 @@ def user_registration():
         response['status_code'] = 200
         response['data'] = tuple(accumulator)
         return jsonify(response)
-
+    # LOGIN
     if request.method == "PATCH":
-        user_email = request.json["user_email"]
+        username = request.json["username"]
         password = request.json["password"]
 
         with sqlite3.connect("final_backend.db") as conn:
+            conn.row_factory = dict_factory
             cursor = conn.cursor()
-            cursor.row_factory = sqlite3.Row
-            cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (user_email, password,))
+            cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (username, password,))
             user = cursor.fetchone()
-            accumulator = []
-
-            for i in user:
-                accumulator.append({k: i[k] for k in i.keys()})
-
         response['status_code'] = 200
-        response['data'] = tuple(accumulator)
-        return jsonify(response)
+        response['data'] = user
+        return response
 
 
 # get single user
