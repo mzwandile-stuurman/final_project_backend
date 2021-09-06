@@ -191,7 +191,7 @@ def identity(payload):
 
 
 app = Flask(__name__)
-CORS(app)
+#CORS(app)
 app.debug = True
 app.config['SECRET_KEY'] = 'super-secret'
 app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=2)
