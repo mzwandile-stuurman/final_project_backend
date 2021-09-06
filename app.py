@@ -322,7 +322,7 @@ def edit_user(user_id):
 
             put_data = {}
 
-            if incoming_data.get("first_name") is not None:  # check if the updated column is price
+            if incoming_data.get("first_name") is not None:  # check if the updated column is first_name
                 put_data["first_name"] = incoming_data.get("first_name")
                 with sqlite3.connect('final_backend.db') as conn:
                     cursor = conn.cursor()
