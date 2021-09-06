@@ -298,11 +298,11 @@ def get_user(user_id):
 @app.route("/delete-user/<int:post_id>", methods=['POST'])
 @cross_origin()
 # @jwt_required()
-def delete_product(user_id):
+def delete_product(post_id):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM users WHERE user_id=" + str(user_id))
+        cursor.execute("DELETE FROM users WHERE user_id=" + str(post_id))
         conn.commit()
         response['status_code'] = 200
         response['message'] = "User deleted successfully."
