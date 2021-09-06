@@ -214,15 +214,15 @@ def user_registration():
     response = {}
     if request.method == "POST":
 
-        try:
+        #try:
 
-            first_name = request.json['first_name']
-            last_name = request.json['last_name']
-            username = request.json['username']
-            password = request.json['password']
-            address = request.json['address']
-            phone_number = request.json['phone_number']
-            user_email = request.json['user_email']
+            first_name = request.form['first_name']
+            last_name = request.form['last_name']
+            username = request.form['username']
+            password = request.form['password']
+            address = request.form['address']
+            phone_number = request.form['phone_number']
+            user_email = request.form['user_email']
 
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
@@ -237,11 +237,11 @@ def user_registration():
                 response["status_code"] = 201
 
                 return response
-        except Exception:
+        #except Exception:
 
-            response["message"] = "Invalid user injsonation supplied"
-            response["status_code"] = 401
-            return response
+            #response["message"] = "Invalid user injsonation supplied"
+            #response["status_code"] = 401
+            #return response
 
     if request.method == "GET":
         response = {}
