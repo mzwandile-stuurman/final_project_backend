@@ -191,7 +191,7 @@ def identity(payload):
 
 
 app = Flask(__name__)
-#CORS(app)
+CORS(app)
 app.debug = True
 app.config['SECRET_KEY'] = 'super-secret'
 app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=2)
@@ -216,13 +216,13 @@ def user_registration():
 
         #try:
 
-            first_name = request.form['first_name']
-            last_name = request.form['last_name']
-            username = request.form['username']
-            password = request.form['password']
-            address = request.form['address']
-            phone_number = request.form['phone_number']
-            user_email = request.form['user_email']
+            first_name = request.json['first_name']
+            last_name = request.json['last_name']
+            username = request.json['username']
+            password = request.json['password']
+            address = request.json['address']
+            phone_number = request.json['phone_number']
+            user_email = request.json['user_email']
 
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
