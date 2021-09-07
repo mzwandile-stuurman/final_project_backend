@@ -10,6 +10,13 @@ from smtplib import SMTPRecipientsRefused, SMTPAuthenticationError
 from werkzeug.utils import redirect
 
 
+app = Flask(__name__)
+CORS(app, resoures={r"/api/*/": {"origins": "*"}})
+app.debug = True
+app.config['SECRET_KEY'] = 'super-secret'
+app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=2)
+
+
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
@@ -189,12 +196,6 @@ def identity(payload):
     user_id = payload['identity']
     return userid_table.get(user_id, None)
 
-
-app = Flask(__name__)
-CORS(app)
-app.debug = True
-app.config['SECRET_KEY'] = 'super-secret'
-app.config['JWT_EXPIRATION_DELTA'] = datetime.timedelta(days=2)
 
 # authanticate a loggen in user
 jwt = JWT(app, authenticate, identity)
