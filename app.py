@@ -304,7 +304,7 @@ def get_password(username):
         cursor = conn.cursor()
         # cursor.row_factory = sqlite3.Row
         cursor.execute("SELECT * FROM users WHERE password=?", [username])
-        user = cursor.fetchall()
+        user = cursor.fetchone()
         # accumulator = []
         # for i in user:
         # accumulator.append({k: i[k] for k in i.keys()})
