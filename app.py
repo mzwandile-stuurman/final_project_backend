@@ -9,7 +9,6 @@ from flask_mail import Mail, Message
 from smtplib import SMTPRecipientsRefused, SMTPAuthenticationError
 from werkzeug.utils import redirect
 
-
 app = Flask(__name__)
 CORS(app, resoures={r"/api/*": {"origins": "*"}})
 app.debug = True
@@ -214,35 +213,34 @@ def protected():
 def user_registration():
     response = {}
     if request.method == "POST":
+        # try:
 
-        #try:
+        first_name = request.json['first_name']
+        last_name = request.json['last_name']
+        username = request.json['username']
+        password = request.json['password']
+        address = request.json['address']
+        phone_number = request.json['phone_number']
+        user_email = request.json['user_email']
 
-            first_name = request.json['first_name']
-            last_name = request.json['last_name']
-            username = request.json['username']
-            password = request.json['password']
-            address = request.json['address']
-            phone_number = request.json['phone_number']
-            user_email = request.json['user_email']
+        with sqlite3.connect("final_backend.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO users("
+                           "first_name,"
+                           "last_name,"
+                           "username,"
+                           "password,address,phone_number,user_email) VALUES(?, ?, ?, ?, ?, ?, ?)",
+                           (first_name, last_name, username, password, address, phone_number, user_email))
+            conn.commit()
+            response["message"] = "User registered successfully "
+            response["status_code"] = 201
 
-            with sqlite3.connect("final_backend.db") as conn:
-                cursor = conn.cursor()
-                cursor.execute("INSERT INTO users("
-                               "first_name,"
-                               "last_name,"
-                               "username,"
-                               "password,address,phone_number,user_email) VALUES(?, ?, ?, ?, ?, ?, ?)",
-                               (first_name, last_name, username, password, address, phone_number, user_email))
-                conn.commit()
-                response["message"] = "User registered successfully "
-                response["status_code"] = 201
+            return response
+    # except Exception:
 
-                return response
-        #except Exception:
-
-            #response["message"] = "Invalid user injsonation supplied"
-            #response["status_code"] = 401
-            #return response
+    # response["message"] = "Invalid user injsonation supplied"
+    # response["status_code"] = 401
+    # return response
 
     if request.method == "GET":
         response = {}
@@ -296,17 +294,17 @@ def get_user(user_id):
 
 
 # get user by password
-@app.route('/user-info/<password>/', methods=["GET"])
+@app.route('/user-info/<username>', methods=["GET"])
 @cross_origin()
 # @jwt_required()
-def get_password(password):
+def get_password(username):
     response = {}
     with sqlite3.connect("final_backend.db") as conn:
         conn.row_factory = dict_factory
         cursor = conn.cursor()
         # cursor.row_factory = sqlite3.Row
-        cursor.execute("SELECT * FROM users WHERE password=" + str(password))
-        user = cursor.fetchone()
+        cursor.execute("SELECT * FROM users WHERE password=?", [username])
+        user = cursor.fetchall()
         # accumulator = []
         # for i in user:
         # accumulator.append({k: i[k] for k in i.keys()})
