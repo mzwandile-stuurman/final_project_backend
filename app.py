@@ -295,6 +295,27 @@ def get_user(user_id):
     return response
 
 
+# get user by password
+@app.route('/user-info/<password>/', methods=["GET"])
+@cross_origin()
+# @jwt_required()
+def get_password(password):
+    response = {}
+    with sqlite3.connect("final_backend.db") as conn:
+        conn.row_factory = dict_factory
+        cursor = conn.cursor()
+        # cursor.row_factory = sqlite3.Row
+        cursor.execute("SELECT * FROM users WHERE password=" + str(password))
+        user = cursor.fetchone()
+        # accumulator = []
+        # for i in user:
+        # accumulator.append({k: i[k] for k in i.keys()})
+
+    response['status_code'] = 200
+    response['data'] = user  # tuple(accumulator)
+    return response
+
+
 # delete user by id
 @app.route("/delete-user/<int:post_id>", methods=['POST'])
 @cross_origin()
