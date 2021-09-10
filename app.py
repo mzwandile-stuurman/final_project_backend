@@ -175,14 +175,10 @@ def fetch_users():
 
 
 users = fetch_users()  # declare users tables to a variable "users"
-# print(users)
 
 username_table = {u.username: u for u in users}  # make a dictionary for username
 userid_table = {u.id: u for u in users}  # make a dictionary for user id
 
-
-# print(username_table)
-# print(userid_table)
 
 def authenticate(username, password):
     user = username_table.get(username, None)
@@ -213,34 +209,34 @@ def protected():
 def user_registration():
     response = {}
     if request.method == "POST":
-        # try:
+        try:
 
-        first_name = request.json['first_name']
-        last_name = request.json['last_name']
-        username = request.json['username']
-        password = request.json['password']
-        address = request.json['address']
-        phone_number = request.json['phone_number']
-        user_email = request.json['user_email']
+            first_name = request.json['first_name']
+            last_name = request.json['last_name']
+            username = request.json['username']
+            password = request.json['password']
+            address = request.json['address']
+            phone_number = request.json['phone_number']
+            user_email = request.json['user_email']
 
-        with sqlite3.connect("final_backend.db") as conn:
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO users("
-                           "first_name,"
-                           "last_name,"
-                           "username,"
-                           "password,address,phone_number,user_email) VALUES(?, ?, ?, ?, ?, ?, ?)",
-                           (first_name, last_name, username, password, address, phone_number, user_email))
+            with sqlite3.connect("final_backend.db") as conn:
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO users("
+                               "first_name,"
+                               "last_name,"
+                               "username,"
+                               "password,address,phone_number,user_email) VALUES(?, ?, ?, ?, ?, ?, ?)",
+                               (first_name, last_name, username, password, address, phone_number, user_email))
             conn.commit()
             response["message"] = "User registered successfully "
             response["status_code"] = 201
 
             return response
-    # except Exception:
+        except Exception:
 
-    # response["message"] = "Invalid user injsonation supplied"
-    # response["status_code"] = 401
-    # return response
+            response["message"] = "Invalid user injsonation supplied"
+            response["status_code"] = 401
+            return response
 
     if request.method == "GET":
         response = {}
@@ -281,15 +277,11 @@ def get_user(user_id):
     with sqlite3.connect("final_backend.db") as conn:
         conn.row_factory = dict_factory
         cursor = conn.cursor()
-        # cursor.row_factory = sqlite3.Row
         cursor.execute("SELECT * FROM users WHERE user_id=" + str(user_id))
         user = cursor.fetchone()
-        # accumulator = []
-        # for i in user:
-        # accumulator.append({k: i[k] for k in i.keys()})
 
     response['status_code'] = 200
-    response['data'] = user  # tuple(accumulator)
+    response['data'] = user
     return response
 
 
@@ -302,12 +294,9 @@ def get_password(username):
     with sqlite3.connect("final_backend.db") as conn:
         conn.row_factory = dict_factory
         cursor = conn.cursor()
-        # cursor.row_factory = sqlite3.Row
+
         cursor.execute("SELECT * FROM users WHERE password=?", [username])
         user = cursor.fetchone()
-        # accumulator = []
-        # for i in user:
-        # accumulator.append({k: i[k] for k in i.keys()})
 
     response['status_code'] = 200
     response['data'] = user  # tuple(accumulator)
@@ -419,8 +408,6 @@ def edit_user(user_id):
 
     return response
 
-
-# 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
 # View all products
 @app.route('/product/', methods=["POST", "GET"])
 @cross_origin()
@@ -601,7 +588,7 @@ def delete_single_product(prod_id):
         response['message'] = "Product deleted successfully."
     return response
 
-
+# get and post user's orders
 @app.route('/orders/', methods=["POST", "GET"])
 @cross_origin()
 # @jwt_required()
@@ -836,15 +823,15 @@ def contact():
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO contact("
-                               "name,"
-                               "email_address,"
-                               "enquiry) VALUES(?, ?, ?)",
-                               (name, email_address, enquiry))
-                conn.commit()
-                response["message"] = "User registered successfully "
-                response["status_code"] = 201
+                           "name,"
+                           "email_address,"
+                           "enquiry) VALUES(?, ?, ?)",
+                           (name, email_address, enquiry))
+            conn.commit()
+            response["message"] = "User registered successfully "
+            response["status_code"] = 201
 
-                return response
+            return response
         except Exception:
             response["message"] = "Enter valid injsonation"
             response["status_code"] = 401
@@ -917,13 +904,6 @@ def business_site_application():
         response['data'] = tuple(accumulator)
         return jsonify(response)
 
-
-# register a new business partner
-
-# Flask-Mail==0.9.1
-
-# git config --global user.email "you@example.com"
-# git config --global user.name "Your Name"
 
 if __name__ == '__main__':
     app.run(debug=True)
