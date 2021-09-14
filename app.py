@@ -90,14 +90,14 @@ def shipping_address():
     conn = sqlite3.connect('final_backend.db')
     print("Opened database successfully")
 
-    conn.execute("CREATE TABLE IF NOT EXISTS shipping_table(ship_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+    conn.execute("CREATE TABLE IF NOT EXISTS shipment_table(ship_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                  "recipient_name TEXT NOT NULL,"
-                 "recipient_lastname TEXT NOT NULL,"
-                 "company TEXT,"
+                 "recipient_phone TEXT NOT NUll,"
                  "recipient_address TEXT NOT NULL,"
-                 "building_name TEXT NOT NULL," "city TEXT NOT NULL,"
-                 "country TEXT NOT NULL," "province TEXT NOT NULL,"
-                 "postal_code TEXT NOT NULL," "recipient_phone TEXT NOT NUll," "user_id INTEGER NOT NULL,"
+                 "email TEXT NOT NULL,"
+                 "city TEXT NOT NULL,"
+                 "province TEXT NOT NULL," "country TEXT NOT NULL,"
+                 "postal_code TEXT NOT NULL," "user_id INTEGER NOT NULL,"
                  "FOREIGN KEY(user_id) REFERENCES users(user_id))")
     print("shipping table created successfully")
     conn.close()
@@ -733,7 +733,7 @@ def returns_info():
 
 
 # get returns by id
-@app.route('/get-returns/<int:orde_number>', methods=["GET"])
+@app.route('/get-returns/<int:order_number>', methods=["GET"])
 @cross_origin()
 # @jwt_required()
 def returns(order_number):
@@ -763,31 +763,35 @@ def shipping_address():
 
             recipient_name = request.json['recipient_name']
             recipient_lastname = request.json['recipient_lastname']
-            company = request.json['company']
             recipient_address = request.json['recipient_address']
-            building_name = request.json['building_name']
+            email = request.json['email']
+            city = request.json['city']
+            province = request.json['province']
             country = request.json['country']
-            postal_code = request.json['product_condition']
+            postal_code = request.json['postal_code']
+            user_id = request.json['user_id']
 
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
-                cursor.execute("INSERT INTO shipping_table("
+                cursor.execute("INSERT INTO shipment_table("
                                "recipient_name,"
                                "recipient_lastname,"
-                               "company,"
                                "recipient_address,"
-                               "building_name,"
+                               "email,"
+                               "city,"
+                               "province,"
                                "country,"
-                               "postal_code) VALUES(?, ?, ?, ?, ?, ?, ?)",
-                               (recipient_name, recipient_lastname, company, recipient_address, building_name, country,
-                                postal_code))
+                               "postal_code,"
+                               "user_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                               (recipient_name, recipient_lastname, recipient_address, email, city, province,
+                                country, postal_code, user_id))
                 conn.commit()
-                response["message"] = "Alternate address added"
+                response["message"] = "shipment recorded"
                 response["status_code"] = 201
 
                 return response
         except Exception:
-            response["message"] = "Enter full injsonation"
+            response["message"] = "Something went wrong"
             response["status_code"] = 401
             return response
     if request.method == "GET":
