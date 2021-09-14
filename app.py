@@ -90,14 +90,14 @@ def shipping_address():
     conn = sqlite3.connect('final_backend.db')
     print("Opened database successfully")
 
-    conn.execute("CREATE TABLE IF NOT EXISTS shipment_table(ship_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+    conn.execute("CREATE TABLE IF NOT EXISTS shipments(ship_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                  "recipient_name TEXT NOT NULL,"
-                 "recipient_phone TEXT NOT NUll,"
+                 "recipient_lastname TEXT NOT NUll,"
                  "recipient_address TEXT NOT NULL,"
-                 "email TEXT NOT NULL,"
+                 "recipient_email TEXT NOT NULL,"
                  "city TEXT NOT NULL,"
                  "province TEXT NOT NULL," "country TEXT NOT NULL,"
-                 "postal_code TEXT NOT NULL," "user_id INTEGER NOT NULL,"
+                 "postal_code TEXT NOT NULL," "user_id TEXT NOT NULL,"
                  "FOREIGN KEY(user_id) REFERENCES users(user_id))")
     print("shipping table created successfully")
     conn.close()
@@ -757,14 +757,14 @@ def returns(order_number):
 # @jwt_required()
 def shipping_address():
     response = {}
-    now = datetime.now()
+
     if request.method == "POST":
-        try:
+        #try:
 
             recipient_name = request.json['recipient_name']
             recipient_lastname = request.json['recipient_lastname']
             recipient_address = request.json['recipient_address']
-            email = request.json['email']
+            recipient_email = request.json['recipient_email']
             city = request.json['city']
             province = request.json['province']
             country = request.json['country']
@@ -773,27 +773,27 @@ def shipping_address():
 
             with sqlite3.connect("final_backend.db") as conn:
                 cursor = conn.cursor()
-                cursor.execute("INSERT INTO shipment_table("
+                cursor.execute(" INSERT INTO shipments ("
                                "recipient_name,"
                                "recipient_lastname,"
                                "recipient_address,"
-                               "email,"
+                               "recipient_email,"
                                "city,"
                                "province,"
                                "country,"
                                "postal_code,"
                                "user_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                               (recipient_name, recipient_lastname, recipient_address, email, city, province,
-                                country, postal_code, user_id))
+                               (str(recipient_name), str(recipient_lastname), str(recipient_address), str(recipient_email), str(city), str(province),
+                                str(country), str(postal_code), str(user_id)))
                 conn.commit()
                 response["message"] = "shipment recorded"
                 response["status_code"] = 201
 
                 return response
-        except Exception:
-            response["message"] = "Something went wrong"
-            response["status_code"] = 401
-            return response
+        #except Exception:
+            #response["message"] = "Something went wrong"
+            #response["status_code"] = 401
+            #return response
     if request.method == "GET":
 
         with sqlite3.connect("final_backend.db") as conn:
